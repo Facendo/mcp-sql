@@ -1,0 +1,4 @@
+/vendor/
+.env
+mcp-sql.log
+.phpunit.result.cache

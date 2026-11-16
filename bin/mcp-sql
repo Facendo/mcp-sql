@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * ============================================================================
+ *  REGLA DE ORO DEL TRANSPORTE STDIO
+ * ----------------------------------------------------------------------------
+ *  STDOUT pertenece EXCLUSIVAMENTE al protocolo JSON-RPC.
+ *  Un solo echo, var_dump, print_r o warning de PHP escrito en STDOUT corrompe
+ *  el flujo y el cliente MCP desconecta sin explicacion alguna.
+ *
+ *  Para depurar: fwrite(STDERR, "...") o el logger a archivo. NUNCA echo.
+ * ============================================================================
+ */
+
+ini_set('display_errors', 'stderr');
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../mcp-sql.log');
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Mcp\Server\Server;
+use Mcp\Server\Transport\StdioTransport;
+
+exit(
+    Server::builder()
+        ->setServerInfo(
+            name: 'mcp-sql',
+            version: '0.1.0',
+            description: 'Acceso de solo lectura a MySQL/MariaDB para generar reportes.',
+        )
+        ->setDiscovery(
+            basePath: __DIR__ . '/..',
+            scanDirs: ['src'],
+            excludeDirs: ['vendor'],
+        )
+        ->build()
+        ->run(new StdioTransport())
+);
